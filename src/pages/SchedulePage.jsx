@@ -52,6 +52,34 @@ function buildStartsAt(isoDate, timeStr) {
   return isoDate && timeStr ? `${isoDate}T${timeStr}:00` : new Date().toISOString()
 }
 
+function buildScheduleDaysForTrip(trip) {
+  if (!trip?.start_date || !trip?.end_date) return null
+  const start = new Date(trip.start_date)
+  const end = new Date(trip.end_date)
+  if (isNaN(start) || isNaN(end) || end < start) return null
+
+  const days = []
+  let current = new Date(start)
+  let order = 0
+  while (current <= end) {
+    const dayKey = current.toLocaleDateString('en-US', { weekday: 'short' }).toLowerCase().slice(0, 3)
+    const label = current.toLocaleDateString('he-IL', { weekday: 'long' })
+    const date = current.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+
+    days.push({
+      id: `day_${dayKey}`,
+      day_key: dayKey,
+      label,
+      date,
+      iso_date: current.toISOString().slice(0, 10),
+      sort_order: order++,
+    })
+
+    current.setDate(current.getDate() + 1)
+  }
+  return days
+}
+
 // ── Sub-components ────────────────────────────────────────────────────────────
 
 function MemberAvatars({ members, max = 4 }) {
@@ -135,11 +163,11 @@ export default function SchedulePage() {
   // ── Load ────────────────────────────────────────────────────────────────────
 
   useEffect(() => {
-    const d = svc.getScheduleDays()
+    const tripDays = buildScheduleDaysForTrip(activeTrip)
+    const d = tripDays || svc.getScheduleDays()
     setDays(d)
-    const fri = d.find(x => x.day_key === 'fri') || d[0]
-    if (fri) setActiveDayId(fri.id)
-  }, [activeTrip?.id])
+    if (d.length) setActiveDayId(d[0].id)
+  }, [activeTrip?.id, activeTrip?.start_date, activeTrip?.end_date])
 
   useEffect(() => {
     if (!activeDayId) return
@@ -153,7 +181,7 @@ export default function SchedulePage() {
       })
       setAttendance(att)
     }
-  }, [activeDayId, activeTrip?.id])
+  }, [activeDayId, activeTrip?.start_date, activeTrip?.end_date])
 
   function refresh() { setItems(svc.getScheduleItemsByDay(activeDayId)) }
 
