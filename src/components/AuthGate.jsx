@@ -6,7 +6,7 @@ import {
   signInWithGoogle,
   verifyOtp,
 } from '../lib/supabase'
-import { loadDemoUser, saveDemoUser, clearDemoUser } from '../lib/tripService'
+import { loadDemoUser, saveDemoUser, clearDemoUser } from '../lib/eventService'
 
 const AuthContext = createContext(null)
 

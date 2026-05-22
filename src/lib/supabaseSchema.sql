@@ -353,3 +353,188 @@ create policy "owner or uploader can delete photo"
         and trips.owner_id = auth.uid()
     )
   );
+
+-- ── memory_albums ─────────────────────────────────────────────────────────────
+create table public.memory_albums (
+  id                       uuid primary key default gen_random_uuid(),
+  event_id                 uuid references public.trips not null,
+  title                    text not null,
+  description              text,
+  icon                     text not null,
+  gradient                 text,
+  cover_photo_url          text,
+  created_by               uuid references auth.users,
+  created_by_display_name  text,
+  created_at               timestamptz default now(),
+  updated_at               timestamptz default now()
+);
+
+alter table public.memory_albums enable row level security;
+
+create policy "event members can read memory albums"
+  on public.memory_albums for select
+  using (
+    exists (
+      select 1 from public.trip_members
+      where trip_members.trip_id = memory_albums.event_id
+        and trip_members.user_id = auth.uid()
+    )
+  );
+
+create policy "event members can create memory albums"
+  on public.memory_albums for insert
+  with check (
+    created_by = auth.uid()
+    and exists (
+      select 1 from public.trip_members
+      where trip_members.trip_id = memory_albums.event_id
+        and trip_members.user_id = auth.uid()
+    )
+  );
+
+create policy "owner or admin can update memory albums"
+  on public.memory_albums for update
+  using (
+    exists (
+      select 1 from public.trip_members
+      where trip_members.trip_id = memory_albums.event_id
+        and trip_members.user_id = auth.uid()
+        and trip_members.role in ('owner','admin')
+    )
+  );
+
+create policy "owner or admin can delete memory albums"
+  on public.memory_albums for delete
+  using (
+    exists (
+      select 1 from public.trip_members
+      where trip_members.trip_id = memory_albums.event_id
+        and trip_members.user_id = auth.uid()
+        and trip_members.role in ('owner','admin')
+    )
+  );
+
+-- ── memory_photos ─────────────────────────────────────────────────────────────
+create table public.memory_photos (
+  id                           uuid primary key default gen_random_uuid(),
+  event_id                     uuid references public.trips not null,
+  album_id                     uuid references public.memory_albums(id) on delete cascade,
+  image_url                    text not null,
+  thumbnail_url                text,
+  caption                      text,
+  uploaded_by                  uuid references auth.users,
+  uploaded_by_display_name     text,
+  uploaded_by_avatar_url       text,
+  is_bride_pick                boolean default false,
+  favorite_count               int default 0,
+  created_at                   timestamptz default now(),
+  updated_at                   timestamptz default now()
+);
+
+alter table public.memory_photos enable row level security;
+
+create policy "event members can read memory photos"
+  on public.memory_photos for select
+  using (
+    exists (
+      select 1 from public.trip_members
+      where trip_members.trip_id = memory_photos.event_id
+        and trip_members.user_id = auth.uid()
+    )
+  );
+
+create policy "event members can upload memory photos"
+  on public.memory_photos for insert
+  with check (
+    uploaded_by = auth.uid()
+    and exists (
+      select 1 from public.trip_members
+      where trip_members.trip_id = memory_photos.event_id
+        and trip_members.user_id = auth.uid()
+    )
+  );
+
+create policy "uploader or moderator can delete memory photo"
+  on public.memory_photos for delete
+  using (
+    uploaded_by = auth.uid()
+    or exists (
+      select 1 from public.trip_members
+      where trip_members.trip_id = memory_photos.event_id
+        and trip_members.user_id = auth.uid()
+        and trip_members.role in ('owner','admin')
+    )
+  );
+
+create policy "owner or admin can mark bride pick"
+  on public.memory_photos for update
+  using (
+    exists (
+      select 1 from public.trip_members
+      where trip_members.trip_id = memory_photos.event_id
+        and trip_members.user_id = auth.uid()
+        and trip_members.role in ('owner','admin')
+    )
+  );
+
+-- ── photo_favorites ───────────────────────────────────────────────────────────
+create table public.photo_favorites (
+  id         uuid primary key default gen_random_uuid(),
+  event_id   uuid references public.trips not null,
+  photo_id   uuid references public.memory_photos(id) on delete cascade,
+  user_id    uuid references auth.users not null,
+  created_at timestamptz default now(),
+  unique (photo_id, user_id)
+);
+
+alter table public.photo_favorites enable row level security;
+
+create policy "event members can read favorites"
+  on public.photo_favorites for select
+  using (
+    exists (
+      select 1 from public.trip_members
+      where trip_members.trip_id = photo_favorites.event_id
+        and trip_members.user_id = auth.uid()
+    )
+  );
+
+create policy "users can manage own favorites"
+  on public.photo_favorites for all
+  using (user_id = auth.uid())
+  with check (user_id = auth.uid());
+
+-- ── photo_reactions ───────────────────────────────────────────────────────────
+create table public.photo_reactions (
+  id            uuid primary key default gen_random_uuid(),
+  event_id      uuid references public.trips not null,
+  photo_id      uuid references public.memory_photos(id) on delete cascade,
+  user_id       uuid references auth.users not null,
+  reaction_text text not null,
+  created_at    timestamptz default now()
+);
+
+alter table public.photo_reactions enable row level security;
+
+create policy "event members can read reactions"
+  on public.photo_reactions for select
+  using (
+    exists (
+      select 1 from public.trip_members
+      where trip_members.trip_id = photo_reactions.event_id
+        and trip_members.user_id = auth.uid()
+    )
+  );
+
+create policy "users can manage own reactions"
+  on public.photo_reactions for all
+  using (user_id = auth.uid())
+  with check (user_id = auth.uid());
+
+-- ── Storage: event-memories bucket ───────────────────────────────────────────
+-- Run in Supabase dashboard → Storage → New bucket → event-memories (public: false)
+--
+-- Storage policies:
+--   insert: auth.uid() is event member AND path starts with 'events/{event_id}/...'
+--   select: auth.uid() is event member
+--   delete: auth.uid() is uploader OR auth.uid() is owner/admin of event

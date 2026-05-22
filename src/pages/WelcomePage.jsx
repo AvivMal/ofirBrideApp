@@ -1,17 +1,31 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Calendar, MessageCircle, MapPin, Image, ChevronLeft, Sparkles } from 'lucide-react'
+import { Calendar, MessageCircle, MapPin, Image, ChevronLeft, Sparkles, RefreshCw } from 'lucide-react'
+import { useEvent } from '../context/EventContext'
 import bgImg from '../assets/background.png'
 
 const menuItems = [
-  { icon: Calendar,      label: 'לוח זמנים',     sub: 'ראה את כל האירועים',    path: '/schedule' },
-  { icon: MessageCircle, label: 'צ׳אט קבוצתי',   sub: '8 מחוברות עכשיו ✨',    path: '/chat' },
-  { icon: MapPin,        label: 'מקומות שמורים', sub: 'מסעדות, חופים ועוד',    path: '/places' },
-  { icon: Image,         label: 'זיכרונות מהטיול', sub: 'התמונות שלנו',         path: '/memories' },
+  { icon: Calendar,       label: 'לו״ז',               sub: 'ראי את לוח הזמנים',       path: '/schedule' },
+  { icon: MessageCircle,  label: 'צ׳אט קבוצתי',        sub: 'שיחה עם כל החברות ✨',     path: '/chat' },
+  { icon: MapPin,         label: 'מקומות שמורים',      sub: 'מסעדות, חופים ועוד',       path: '/places' },
+  { icon: Image,          label: 'זיכרונות מהאירוע',   sub: 'התמונות שלנו',              path: '/memories' },
 ]
+
+function buildHeroTitle(event) {
+  if (!event) return { title: 'Bachelorette', subtitle: 'The weekend begins here ✨' }
+  const dest = event.destination?.trim()
+  const city = dest ? dest.split(',')[0].trim() : ''
+  if (city) return { title: `${city}\nBachelorette`, subtitle: 'The weekend begins here ✨' }
+  if (event.bride_name) return { title: `${event.bride_name}'s\nBachelorette`, subtitle: 'The weekend begins here ✨' }
+  return { title: event.name || 'Bachelorette', subtitle: 'The weekend begins here ✨' }
+}
 
 export default function WelcomePage() {
   const navigate = useNavigate()
+  const { activeEvent, allEvents } = useEvent()
+
+  const { title, subtitle } = buildHeroTitle(activeEvent)
+  const titleLines = title.split('\n')
 
   return (
     <div style={{
@@ -20,11 +34,30 @@ export default function WelcomePage() {
       display: 'flex', flexDirection: 'column',
       overflow: 'hidden',
     }}>
-      {/* Layered overlays for depth */}
+      {/* Overlays */}
       <div style={{ position: 'fixed', inset: 0, background: 'linear-gradient(180deg, rgba(0,20,50,0.15) 0%, rgba(0,10,30,0.55) 55%, rgba(0,5,20,0.8) 100%)' }} />
       <div style={{ position: 'fixed', inset: 0, background: 'radial-gradient(ellipse at 30% 20%, rgba(255,180,100,0.18) 0%, transparent 60%)' }} />
       <div style={{ position: 'fixed', inset: 0, background: 'radial-gradient(ellipse at 70% 80%, rgba(45,212,191,0.12) 0%, transparent 60%)' }} />
 
+      {/* Switch event button — top right, only when multiple events */}
+      {allEvents.length > 1 && (
+        <button
+          onClick={() => navigate('/events')}
+          style={{
+            position: 'fixed', top: '52px', right: '16px', zIndex: 20,
+            display: 'flex', alignItems: 'center', gap: '5px',
+            background: 'rgba(255,255,255,0.12)',
+            backdropFilter: 'blur(12px)',
+            border: '1px solid rgba(255,255,255,0.2)',
+            borderRadius: '20px', padding: '7px 12px',
+            color: 'rgba(255,255,255,0.7)', fontSize: '12px',
+            fontFamily: '"Assistant", sans-serif', cursor: 'pointer', direction: 'rtl',
+          }}
+        >
+          <RefreshCw size={12} />
+          החלפת אירוע
+        </button>
+      )}
 
       {/* Content */}
       <div style={{ position: 'relative', zIndex: 10, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '0 20px 100px' }}>
@@ -33,7 +66,7 @@ export default function WelcomePage() {
         <div style={{ textAlign: 'center', marginBottom: '28px', animation: 'fadeInUp 0.8s ease forwards' }}>
           <h1 style={{
             fontFamily: '"Great Vibes", cursive',
-            fontSize: '64px',
+            fontSize: titleLines[0].length > 10 ? '52px' : '64px',
             fontWeight: 400,
             color: '#fff',
             lineHeight: 1.15,
@@ -42,7 +75,9 @@ export default function WelcomePage() {
             letterSpacing: '1px',
             direction: 'ltr',
           }}>
-            Rhodes<br />Bachelorette
+            {titleLines.map((line, i) => (
+              <React.Fragment key={i}>{line}{i < titleLines.length - 1 && <br />}</React.Fragment>
+            ))}
           </h1>
           <p style={{
             fontFamily: '"Assistant", sans-serif',
@@ -53,7 +88,7 @@ export default function WelcomePage() {
             textShadow: '0 2px 8px rgba(0,0,0,0.4)',
             direction: 'ltr',
           }}>
-            The trip begins here ✨
+            {subtitle}
           </p>
         </div>
 
@@ -71,24 +106,20 @@ export default function WelcomePage() {
           <div className="sparkle-dot sparkle-dot--top-right" />
           <div className="sparkle-dot sparkle-dot--bottom-left" />
 
-          {menuItems.map(({ icon: Icon, label, sub, path, emoji }, i) => (
+          {menuItems.map(({ icon: Icon, label, sub, path }, i) => (
             <button
               key={path}
               onClick={() => navigate(path)}
               style={{
                 position: 'relative',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '14px',
+                display: 'flex', alignItems: 'center', gap: '14px',
                 padding: '16px 18px',
                 background: 'rgba(255,255,255,0.12)',
                 border: '1px solid rgba(255,255,255,0.18)',
-                borderRadius: '24px',
-                cursor: 'pointer',
+                borderRadius: '24px', cursor: 'pointer',
                 transition: 'transform 0.25s ease, background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease',
                 animation: `fadeInUp 0.7s ease ${0.1 + i * 0.08}s both`,
-                width: '100%',
-                textAlign: 'right',
+                width: '100%', textAlign: 'right',
                 boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.18)',
               }}
               onMouseEnter={e => {
@@ -103,14 +134,12 @@ export default function WelcomePage() {
               }}
             >
               <ChevronLeft size={18} color="rgba(255,255,255,0.55)" style={{ marginRight: 'auto', flexShrink: 0 }} />
-
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <div style={{ color: '#fff', fontWeight: 600, fontSize: '15px', lineHeight: 1.3 }}>{label}</div>
                 </div>
                 <div style={{ color: 'rgba(255,255,255,0.55)', fontSize: '12px', marginTop: '4px' }}>{sub}</div>
               </div>
-
               <div style={{
                 width: '46px', height: '46px',
                 background: 'rgba(255,255,255,0.18)',
@@ -130,25 +159,17 @@ export default function WelcomePage() {
         <button
           onClick={() => navigate('/schedule')}
           style={{
-            width: '100%',
-            padding: '18px',
+            width: '100%', padding: '18px',
             background: 'linear-gradient(135deg, rgba(45,212,191,0.45) 0%, rgba(255,255,255,0.2) 38%, rgba(14,165,233,0.55) 100%)',
             backdropFilter: 'blur(12px)',
             WebkitBackdropFilter: 'blur(12px)',
             border: '1px solid rgba(255,255,255,0.35)',
-            borderRadius: '999px',
-            color: '#fff',
-            fontSize: '17px',
-            fontWeight: 700,
-            letterSpacing: '0.3px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '10px',
+            borderRadius: '999px', color: '#fff',
+            fontSize: '17px', fontWeight: 700, letterSpacing: '0.3px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
             boxShadow: '0 12px 36px rgba(45,212,191,0.35), inset 0 1px 0 rgba(255,255,255,0.2)',
             animation: 'fadeInUp 0.8s ease 0.5s both, pulse-glow 3s ease-in-out 1.5s infinite',
-            cursor: 'pointer',
-            direction: 'ltr',
+            cursor: 'pointer', direction: 'ltr',
             transition: 'transform 0.2s ease, box-shadow 0.2s ease',
           }}
           onMouseEnter={e => {

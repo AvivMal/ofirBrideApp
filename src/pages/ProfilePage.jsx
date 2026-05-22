@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
-import { Settings, LogOut, Crown, Bell, Shield, HelpCircle, Users, Copy, MessageCircle, ChevronLeft, Check, Plus } from 'lucide-react'
+import { Settings, LogOut, Crown, Bell, Shield, HelpCircle, Users, Copy, MessageCircle, ChevronLeft, Check, Plus, RefreshCw } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import BottomNav from '../components/BottomNav'
 import { useAuth } from '../components/AuthGate'
-import { useTrip } from '../context/TripContext'
+import { useTrip } from '../context/EventContext'
 import bgImg from '../assets/background.png'
 
 const COLORS = ['#2dd4bf','#f472b6','#a78bfa','#fb923c','#34d399','#60a5fa','#e879f9','#fbbf24']
@@ -16,7 +16,7 @@ function colorFor(userId = '') {
 export default function ProfilePage() {
   const navigate = useNavigate()
   const { signOut } = useAuth()
-  const { activeTrip, currentMember, members, isOwner, isGuest, createInvite } = useTrip()
+  const { activeTrip, currentMember, members, isOwner, isGuest, createInvite, allEvents } = useTrip()
 
   const [inviteModal, setInviteModal]   = useState(false)
   const [currentInvite, setCurrentInvite] = useState(null)
@@ -108,7 +108,7 @@ export default function ProfilePage() {
               {isOwner && <span style={{ color: '#8EEBFF', fontSize: '13px', marginRight: '6px' }}>• הכלה</span>}
             </div>
             <div style={{ color: 'rgba(255,255,255,0.45)', fontSize: '13px', marginTop: '3px' }}>
-              {activeTrip?.name || 'Rhodes Bachelorette'} ✨
+              {activeTrip?.name || 'מסיבת הרווקות'} ✨
             </div>
           </div>
 
@@ -261,6 +261,22 @@ export default function ProfilePage() {
               </div>
             </button>
           ))}
+
+          {/* Switch event (if multiple) */}
+          {allEvents.length > 1 && (
+            <button onClick={() => navigate('/events')} style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+              padding: '14px',
+              background: 'rgba(142,235,255,0.08)',
+              border: '1px solid rgba(142,235,255,0.2)',
+              borderRadius: '16px', width: '100%', cursor: 'pointer',
+              color: '#8EEBFF', fontSize: '14px', fontWeight: 600,
+              fontFamily: '"Assistant", sans-serif', direction: 'rtl',
+            }}>
+              <RefreshCw size={15} />
+              החלפת אירוע
+            </button>
+          )}
 
           {/* Sign out */}
           <button onClick={handleSignOut} style={{

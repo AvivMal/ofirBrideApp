@@ -1,18 +1,19 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { AuthProvider, useAuth } from './components/AuthGate'
-import { TripProvider, useTrip } from './context/TripContext'
+import { EventProvider, useEvent } from './context/EventContext'
 
-import AuthPage         from './pages/AuthPage'
-import WelcomePage      from './pages/WelcomePage'
-import OnboardingPage   from './pages/OnboardingPage'
-import InvitePage       from './pages/InvitePage'
-import SchedulePage     from './pages/SchedulePage'
-import ChatPage         from './pages/ChatPage'
-import PlacesPage       from './pages/PlacesPage'
-import MemoriesPage     from './pages/MemoriesPage'
-import ProfilePage      from './pages/ProfilePage'
-import PrivateChatPage  from './pages/PrivateChatPage'
+import AuthPage            from './pages/AuthPage'
+import WelcomePage         from './pages/WelcomePage'
+import CreateEventPage     from './pages/CreateEventPage'
+import EventSelectionPage  from './pages/EventSelectionPage'
+import InvitePage          from './pages/InvitePage'
+import SchedulePage        from './pages/SchedulePage'
+import ChatPage            from './pages/ChatPage'
+import PlacesPage          from './pages/PlacesPage'
+import MemoriesPage        from './pages/MemoriesPage'
+import ProfilePage         from './pages/ProfilePage'
+import PrivateChatPage     from './pages/PrivateChatPage'
 
 function Spinner() {
   return (
@@ -31,15 +32,15 @@ function Spinner() {
 
 function AppRoutes() {
   const { user, loading: authLoading, demoMode } = useAuth()
-  const { activeTrip, loading: tripLoading }     = useTrip()
+  const { activeEvent, allEvents, loading: eventLoading } = useEvent()
   const { pathname } = useLocation()
 
-  const isLoading = authLoading || (!!user && tripLoading)
+  const isLoading = authLoading || (!!user || demoMode) && eventLoading
   const isAuthed  = !!user || demoMode
 
   if (isLoading) return <Spinner />
 
-  // Invite route is always public — no auth guard needed
+  // Invite route is always public
   if (pathname.startsWith('/invite/')) {
     return (
       <Routes>
@@ -49,18 +50,34 @@ function AppRoutes() {
     )
   }
 
+  // Root redirect logic
+  function rootRedirect() {
+    if (!isAuthed) return <Navigate to="/auth" replace />
+    if (allEvents.length === 0) return <Navigate to="/create-event" replace />
+    if (allEvents.length === 1 || activeEvent) return <Navigate to="/welcome" replace />
+    return <Navigate to="/events" replace />
+  }
+
   return (
     <Routes>
       {/* Public */}
-      <Route path="/auth"           element={<AuthPage />} />
-      <Route path="/invite/:token"  element={<InvitePage />} />
+      <Route path="/auth"          element={<AuthPage />} />
+      <Route path="/invite/:token" element={<InvitePage />} />
 
-      {/* Auth required */}
-      <Route path="/onboarding/create-trip" element={
-        !isAuthed ? <Navigate to="/auth" replace /> : <OnboardingPage />
+      {/* Auth required — event optional */}
+      <Route path="/create-event" element={
+        !isAuthed ? <Navigate to="/auth" replace /> : <CreateEventPage />
+      } />
+      <Route path="/events" element={
+        !isAuthed ? <Navigate to="/auth" replace /> : <EventSelectionPage />
       } />
 
-      {/* Auth + trip required */}
+      {/* Legacy route — OnboardingPage was at this path */}
+      <Route path="/onboarding/create-trip" element={
+        !isAuthed ? <Navigate to="/auth" replace /> : <CreateEventPage />
+      } />
+
+      {/* Auth + active event required */}
       <Route path="/welcome"   element={<ProtectedApp><WelcomePage /></ProtectedApp>} />
       <Route path="/schedule"  element={<ProtectedApp><SchedulePage /></ProtectedApp>} />
       <Route path="/chat"      element={<ProtectedApp><ChatPage /></ProtectedApp>} />
@@ -69,25 +86,25 @@ function AppRoutes() {
       <Route path="/profile"   element={<ProtectedApp><ProfilePage /></ProtectedApp>} />
       <Route path="/chat/private/:memberId" element={<ProtectedApp><PrivateChatPage /></ProtectedApp>} />
 
-      {/* Root redirect */}
-      <Route path="/" element={
-        !isAuthed   ? <Navigate to="/auth" replace /> :
-        !activeTrip ? <Navigate to="/onboarding/create-trip" replace /> :
-                      <Navigate to="/welcome" replace />
-      } />
+      {/* Root */}
+      <Route path="/" element={rootRedirect()} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
 }
 
-// Wraps routes that need auth + an active trip
 function ProtectedApp({ children }) {
   const { user, demoMode } = useAuth()
-  const { activeTrip }     = useTrip()
+  const { activeEvent, allEvents, loading } = useEvent()
   const isAuthed = !!user || demoMode
 
-  if (!isAuthed)   return <Navigate to="/auth" replace />
-  if (!activeTrip) return <Navigate to="/onboarding/create-trip" replace />
+  if (!isAuthed) return <Navigate to="/auth" replace />
+  if (loading)   return <Spinner />
+  if (!activeEvent) {
+    if (allEvents.length === 0) return <Navigate to="/create-event" replace />
+    // 1 or more events but none active → go to selection so user can pick
+    return <Navigate to="/events" replace />
+  }
   return children
 }
 
@@ -95,9 +112,9 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <TripProvider>
+        <EventProvider>
           <AppRoutes />
-        </TripProvider>
+        </EventProvider>
       </AuthProvider>
     </BrowserRouter>
   )

@@ -52,7 +52,7 @@ export default function InvitePage() {
     enterDemo(name.trim(), userId)
 
     // Navigate after brief delay to let context re-hydrate
-    setTimeout(() => navigate('/schedule'), 150)
+    setTimeout(() => navigate('/welcome'), 150)
   }
 
   const { trip, bride } = inviteData || {}
