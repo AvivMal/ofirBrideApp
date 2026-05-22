@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { ChevronRight, Phone, Paperclip, Image as ImageIcon, Mic, Send, Play, Pause, MapPin, Calendar, X } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import StatusBar from '../components/StatusBar'
 import BottomNav from '../components/BottomNav'
 import { chatMessages, participants } from '../data/mockData'
 import bgImg from '../assets/background.png'
@@ -234,10 +233,9 @@ export default function ChatPage() {
     }}>
       <div style={{ position: 'fixed', inset: 0, background: 'linear-gradient(180deg, rgba(0,15,40,0.6) 0%, rgba(0,8,25,0.78) 100%)' }} />
 
-      <StatusBar />
 
       {/* Chat container */}
-      <div style={{ position: 'relative', zIndex: 10, flex: 1, display: 'flex', flexDirection: 'column', paddingTop: '58px', paddingBottom: '76px', overflow: 'hidden' }}>
+      <div style={{ position: 'relative', zIndex: 10, flex: 1, display: 'flex', flexDirection: 'column', paddingTop: '16px', paddingBottom: '76px', overflow: 'hidden' }}>
 
         {/* Top header */}
         <div style={{

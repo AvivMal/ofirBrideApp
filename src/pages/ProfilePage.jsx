@@ -1,7 +1,6 @@
 import React from 'react'
 import { Settings, LogOut, Crown, Bell, Shield, HelpCircle } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import StatusBar from '../components/StatusBar'
 import BottomNav from '../components/BottomNav'
 import { useAuth } from '../components/AuthGate'
 import { signOut } from '../lib/supabase'
@@ -32,9 +31,8 @@ export default function ProfilePage() {
     }}>
       <div style={{ position: 'fixed', inset: 0, background: 'linear-gradient(180deg, rgba(0,15,40,0.55) 0%, rgba(0,8,25,0.72) 100%)' }} />
 
-      <StatusBar />
 
-      <div style={{ position: 'relative', zIndex: 10, flex: 1, display: 'flex', flexDirection: 'column', paddingTop: '60px', paddingBottom: '80px', overflow: 'hidden' }}>
+      <div style={{ position: 'relative', zIndex: 10, flex: 1, display: 'flex', flexDirection: 'column', paddingTop: '16px', paddingBottom: '80px', overflow: 'hidden' }}>
 
         {/* Profile card */}
         <div style={{

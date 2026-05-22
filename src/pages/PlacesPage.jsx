@@ -1,6 +1,5 @@
 import React from 'react'
 import { MapPin, Star, Navigation } from 'lucide-react'
-import StatusBar from '../components/StatusBar'
 import BottomNav from '../components/BottomNav'
 import { savedPlaces } from '../data/mockData'
 import bgImg from '../assets/background.png'
@@ -15,9 +14,8 @@ export default function PlacesPage() {
     }}>
       <div style={{ position: 'fixed', inset: 0, background: 'linear-gradient(180deg, rgba(0,15,40,0.55) 0%, rgba(0,8,25,0.72) 100%)' }} />
 
-      <StatusBar />
 
-      <div style={{ position: 'relative', zIndex: 10, flex: 1, display: 'flex', flexDirection: 'column', paddingTop: '60px', paddingBottom: '80px', overflow: 'hidden' }}>
+      <div style={{ position: 'relative', zIndex: 10, flex: 1, display: 'flex', flexDirection: 'column', paddingTop: '16px', paddingBottom: '80px', overflow: 'hidden' }}>
 
         {/* Header */}
         <div style={{

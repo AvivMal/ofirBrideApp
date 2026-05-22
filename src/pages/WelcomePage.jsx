@@ -1,7 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Calendar, MessageCircle, MapPin, Image, ChevronLeft, Sparkles } from 'lucide-react'
-import StatusBar from '../components/StatusBar'
 import bgImg from '../assets/background.png'
 
 const menuItems = [
@@ -26,7 +25,6 @@ export default function WelcomePage() {
       <div style={{ position: 'fixed', inset: 0, background: 'radial-gradient(ellipse at 30% 20%, rgba(255,180,100,0.18) 0%, transparent 60%)' }} />
       <div style={{ position: 'fixed', inset: 0, background: 'radial-gradient(ellipse at 70% 80%, rgba(45,212,191,0.12) 0%, transparent 60%)' }} />
 
-      <StatusBar />
 
       {/* Content */}
       <div style={{ position: 'relative', zIndex: 10, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '0 20px 100px' }}>

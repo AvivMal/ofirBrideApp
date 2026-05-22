@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Mail, Phone, ArrowRight, Eye, Sparkles } from 'lucide-react'
-import StatusBar from '../components/StatusBar'
 import { useAuth } from '../components/AuthGate'
 import {
   signInWithEmailOtp,
@@ -79,7 +78,6 @@ export default function AuthPage() {
       {/* Overlay */}
       <div style={{ position: 'fixed', inset: 0, background: 'linear-gradient(160deg, rgba(0,30,60,0.6) 0%, rgba(0,10,30,0.75) 100%)' }} />
 
-      <StatusBar />
 
       <div style={{ position: 'relative', zIndex: 10, width: '100%', padding: '80px 24px 24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
 

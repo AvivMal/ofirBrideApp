@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { Bell, MapPin, ChevronLeft } from 'lucide-react'
-import StatusBar from '../components/StatusBar'
 import BottomNav from '../components/BottomNav'
 import { scheduleDays, scheduleItems, participants } from '../data/mockData'
 import bgImg from '../assets/background.png'
@@ -77,9 +76,8 @@ export default function SchedulePage() {
       <div style={{ position: 'fixed', inset: 0, background: 'linear-gradient(180deg, rgba(0,15,40,0.55) 0%, rgba(0,8,25,0.72) 100%)' }} />
       <div style={{ position: 'fixed', inset: 0, background: 'radial-gradient(ellipse at 50% 0%, rgba(255,180,100,0.15) 0%, transparent 50%)' }} />
 
-      <StatusBar />
 
-      <div style={{ position: 'relative', zIndex: 10, flex: 1, display: 'flex', flexDirection: 'column', paddingTop: '60px', paddingBottom: '80px', overflow: 'hidden' }}>
+      <div style={{ position: 'relative', zIndex: 10, flex: 1, display: 'flex', flexDirection: 'column', paddingTop: '16px', paddingBottom: '80px', overflow: 'hidden' }}>
 
         {/* Top header */}
         <div style={{
