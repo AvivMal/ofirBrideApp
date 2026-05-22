@@ -50,8 +50,9 @@ export default function AuthPage() {
       type:  tab === 'email' ? 'email' : 'sms',
     })
     if (res.demo || res.data?.session) {
-      enterDemo()
-      navigate('/welcome')
+      // Pass email/phone as display seed so TripContext can use it
+      enterDemo(tab === 'email' ? email : phone)
+      navigate('/')
     } else {
       setMsg('קוד שגוי. נסי שוב.')
     }
@@ -60,12 +61,12 @@ export default function AuthPage() {
 
   async function handleGoogle() {
     const res = await signInWithGoogle()
-    if (res.demo) { enterDemo(); navigate('/welcome') }
+    if (res.demo) { enterDemo(); navigate('/') }
   }
 
   function handleDemoEnter() {
     enterDemo()
-    navigate('/welcome')
+    navigate('/')
   }
 
   return (
