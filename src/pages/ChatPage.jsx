@@ -235,7 +235,7 @@ export default function ChatPage() {
 
 
       {/* Chat container */}
-      <div style={{ position: 'relative', zIndex: 10, flex: 1, display: 'flex', flexDirection: 'column', paddingTop: '16px', paddingBottom: '76px', overflow: 'hidden' }}>
+      <div style={{ position: 'relative', zIndex: 10, flex: 1, display: 'flex', flexDirection: 'column', paddingTop: '16px', paddingBottom: '108px', overflow: 'hidden' }}>
 
         {/* Top header */}
         <div style={{

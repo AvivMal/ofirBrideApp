@@ -77,7 +77,7 @@ export default function SchedulePage() {
       <div style={{ position: 'fixed', inset: 0, background: 'radial-gradient(ellipse at 50% 0%, rgba(255,180,100,0.15) 0%, transparent 50%)' }} />
 
 
-      <div style={{ position: 'relative', zIndex: 10, flex: 1, display: 'flex', flexDirection: 'column', paddingTop: '16px', paddingBottom: '80px', overflow: 'hidden' }}>
+      <div style={{ position: 'relative', zIndex: 10, flex: 1, display: 'flex', flexDirection: 'column', paddingTop: '16px', paddingBottom: '108px', overflow: 'hidden' }}>
 
         {/* Top header */}
         <div style={{
