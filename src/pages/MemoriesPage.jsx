@@ -104,8 +104,7 @@ export default function MemoriesPage() {
 
   const refresh = useCallback(() => {
     if (!eventId) return
-    const ownerName = currentMember?.display_name
-    setAlbums(mem.getAlbums(eventId, userId, ownerName))
+    setAlbums(mem.getAlbums(eventId))
     setPhotos(mem.getPhotos(eventId))
     setFavorites(mem.getUserFavorites(eventId, userId))
     setStats(mem.getMemoryStats(eventId))

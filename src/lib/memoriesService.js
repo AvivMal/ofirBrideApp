@@ -24,14 +24,23 @@ function saveApp(data) {
   }
 }
 
+const EMPTY_MEMORIES = () => ({ albums: [], photos: [], favorites: [], reactions: [] })
+
 function loadMemories(eventId) {
   const app = loadApp()
   if (!app.events?.[eventId]) return null
   if (!app.events[eventId].memories) {
-    app.events[eventId].memories = { albums: [], photos: [], favorites: [], reactions: [] }
+    app.events[eventId].memories = EMPTY_MEMORIES()
     saveApp(app)
   }
-  return app.events[eventId].memories
+  const mem = app.events[eventId].memories
+  // Migration: wipe auto-seeded demo content from older builds
+  if (mem.photos?.some(p => p.is_demo)) {
+    app.events[eventId].memories = EMPTY_MEMORIES()
+    saveApp(app)
+    return app.events[eventId].memories
+  }
+  return mem
 }
 
 function saveMemories(eventId, memories) {
@@ -41,15 +50,7 @@ function saveMemories(eventId, memories) {
   saveApp(app)
 }
 
-// ── Seed demo data ────────────────────────────────────────────────────────────
-
-const DEMO_ALBUMS = [
-  { title: 'לילה ראשון ✨', icon: 'sparkles', description: 'הלילה שפתח את הסופ״ש', gradient: 'linear-gradient(135deg,#667eea,#764ba2)' },
-  { title: 'יום יאכטה 🌊',  icon: 'waves',    description: 'שייט מסביב לאי',         gradient: 'linear-gradient(135deg,#2dd4bf,#0ea5e9)' },
-  { title: 'ארוחת שקיעה 🍷', icon: 'wine',     description: 'ארוחה רומנטית',           gradient: 'linear-gradient(135deg,#f97316,#ec4899)' },
-  { title: 'רופטופ 💃',      icon: 'music',    description: 'מסיבת לילה על הגג',       gradient: 'linear-gradient(135deg,#a855f7,#ec4899)' },
-  { title: 'מאחורי הקלעים 🤍', icon: 'camera', description: 'הרגעים הכי אמיתיים',     gradient: 'linear-gradient(135deg,#6b7280,#9ca3af)' },
-]
+// ── Gradient / emoji fallbacks for real uploads that fail to read ─────────────
 
 const DEMO_PHOTO_GRADIENTS = [
   'linear-gradient(135deg,#667eea,#764ba2)',
@@ -62,70 +63,9 @@ const DEMO_PHOTO_GRADIENTS = [
   'linear-gradient(135deg,#f59e0b,#ef4444)',
 ]
 const DEMO_PHOTO_EMOJIS = ['🌊','✨','🥂','💃','🌅','🛥️','🍷','💫','🌺','💅','👑','🎊']
-const DEMO_CAPTIONS = ['רגע מושלם','אנחנו המלכות','וואו','אייקוני','זה קרה','הכי יפה','forever','love this','מה יפה','אמאלה']
-
-function buildDemoPhotos(eventId, albumId, count, createdBy, displayName) {
-  const now = new Date().toISOString()
-  return Array.from({ length: count }, (_, i) => ({
-    id: uid('photo_'),
-    event_id: eventId,
-    album_id: albumId,
-    image_url: null,
-    thumbnail_url: null,
-    gradient: DEMO_PHOTO_GRADIENTS[i % DEMO_PHOTO_GRADIENTS.length],
-    emoji: DEMO_PHOTO_EMOJIS[i % DEMO_PHOTO_EMOJIS.length],
-    caption: i % 3 === 0 ? DEMO_CAPTIONS[i % DEMO_CAPTIONS.length] : '',
-    uploaded_by: createdBy,
-    uploaded_by_display_name: displayName || 'הכלה',
-    uploaded_by_avatar_url: null,
-    is_bride_pick: i === 0 || i === 3,
-    favorite_count: Math.floor(Math.random() * 6),
-    created_at: now,
-    updated_at: now,
-    is_demo: true,
-  }))
-}
-
-function seedDemoData(eventId, ownerId, ownerName) {
-  const now = new Date().toISOString()
-  const albums = DEMO_ALBUMS.map((a, i) => ({
-    id: uid('album_'),
-    event_id: eventId,
-    title: a.title,
-    description: a.description,
-    icon: a.icon,
-    gradient: a.gradient,
-    cover_photo_url: null,
-    created_by: ownerId,
-    created_by_display_name: ownerName || 'הכלה',
-    created_at: now,
-    updated_at: now,
-  }))
-
-  const photos = []
-  albums.forEach((album, ai) => {
-    const count = [3, 5, 4, 3, 2][ai] || 3
-    photos.push(...buildDemoPhotos(eventId, album.id, count, ownerId, ownerName || 'הכלה'))
-  })
-
-  return { albums, photos, favorites: [], reactions: [] }
-}
-
-function ensureDemoSeeded(eventId, ownerId, ownerName) {
-  const mem = loadMemories(eventId)
-  if (!mem) return
-  if (mem.albums.length === 0) {
-    const demo = seedDemoData(eventId, ownerId, ownerName)
-    saveMemories(eventId, demo)
-    return demo
-  }
-  return mem
-}
-
 // ── Albums ────────────────────────────────────────────────────────────────────
 
-export function getAlbums(eventId, ownerId, ownerName) {
-  ensureDemoSeeded(eventId, ownerId, ownerName)
+export function getAlbums(eventId) {
   const mem = loadMemories(eventId)
   if (!mem) return []
   return [...mem.albums].sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
