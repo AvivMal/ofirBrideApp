@@ -71,13 +71,13 @@ export default function AuthPage() {
 
   return (
     <div style={{
-      position: 'absolute', inset: 0,
+      position: 'fixed', inset: 0,
       background: `url(${bgImg}) center/cover no-repeat`,
       display: 'flex', flexDirection: 'column',
       alignItems: 'center', justifyContent: 'center',
     }}>
       {/* Overlay */}
-      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(160deg, rgba(0,30,60,0.6) 0%, rgba(0,10,30,0.75) 100%)' }} />
+      <div style={{ position: 'fixed', inset: 0, background: 'linear-gradient(160deg, rgba(0,30,60,0.6) 0%, rgba(0,10,30,0.75) 100%)' }} />
 
       <StatusBar />
 

@@ -5,10 +5,10 @@ import StatusBar from '../components/StatusBar'
 import bgImg from '../assets/background.png'
 
 const menuItems = [
-  { icon: Calendar,      label: 'לוח זמנים',     sub: 'ראה את כל האירועים',    path: '/schedule', emoji: '📅' },
-  { icon: MessageCircle, label: 'צ׳אט קבוצתי',   sub: '8 מחוברות עכשיו ✨',    path: '/chat',     emoji: '💬' },
-  { icon: MapPin,        label: 'מקומות שמורים', sub: 'מסעדות, חופים ועוד',    path: '/places',   emoji: '📍' },
-  { icon: Image,         label: 'זיכרונות מהטיול', sub: 'התמונות שלנו',         path: '/memories', emoji: '🖼️' },
+  { icon: Calendar,      label: 'לוח זמנים',     sub: 'ראה את כל האירועים',    path: '/schedule' },
+  { icon: MessageCircle, label: 'צ׳אט קבוצתי',   sub: '8 מחוברות עכשיו ✨',    path: '/chat' },
+  { icon: MapPin,        label: 'מקומות שמורים', sub: 'מסעדות, חופים ועוד',    path: '/places' },
+  { icon: Image,         label: 'זיכרונות מהטיול', sub: 'התמונות שלנו',         path: '/memories' },
 ]
 
 export default function WelcomePage() {
@@ -16,15 +16,15 @@ export default function WelcomePage() {
 
   return (
     <div style={{
-      position: 'absolute', inset: 0,
+      position: 'fixed', inset: 0,
       background: `url(${bgImg}) center/cover no-repeat`,
       display: 'flex', flexDirection: 'column',
       overflow: 'hidden',
     }}>
       {/* Layered overlays for depth */}
-      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,20,50,0.15) 0%, rgba(0,10,30,0.55) 55%, rgba(0,5,20,0.8) 100%)' }} />
-      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 30% 20%, rgba(255,180,100,0.18) 0%, transparent 60%)' }} />
-      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 70% 80%, rgba(45,212,191,0.12) 0%, transparent 60%)' }} />
+      <div style={{ position: 'fixed', inset: 0, background: 'linear-gradient(180deg, rgba(0,20,50,0.15) 0%, rgba(0,10,30,0.55) 55%, rgba(0,5,20,0.8) 100%)' }} />
+      <div style={{ position: 'fixed', inset: 0, background: 'radial-gradient(ellipse at 30% 20%, rgba(255,180,100,0.18) 0%, transparent 60%)' }} />
+      <div style={{ position: 'fixed', inset: 0, background: 'radial-gradient(ellipse at 70% 80%, rgba(45,212,191,0.12) 0%, transparent 60%)' }} />
 
       <StatusBar />
 
@@ -107,9 +107,8 @@ export default function WelcomePage() {
               <ChevronLeft size={18} color="rgba(255,255,255,0.55)" style={{ marginRight: 'auto', flexShrink: 0 }} />
 
               <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <div style={{ color: '#fff', fontWeight: 600, fontSize: '15px', lineHeight: 1.3 }}>{label}</div>
-                  <span style={{ fontSize: '16px' }}>{emoji}</span>
                 </div>
                 <div style={{ color: 'rgba(255,255,255,0.55)', fontSize: '12px', marginTop: '4px' }}>{sub}</div>
               </div>

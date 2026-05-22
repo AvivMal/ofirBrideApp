@@ -8,12 +8,12 @@ import bgImg from '../assets/background.png'
 export default function MemoriesPage() {
   return (
     <div style={{
-      position: 'absolute', inset: 0,
+      position: 'fixed', inset: 0,
       background: `url(${bgImg}) center/cover no-repeat`,
       display: 'flex', flexDirection: 'column',
       overflow: 'hidden',
     }}>
-      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,15,40,0.55) 0%, rgba(0,8,25,0.72) 100%)' }} />
+      <div style={{ position: 'fixed', inset: 0, background: 'linear-gradient(180deg, rgba(0,15,40,0.55) 0%, rgba(0,8,25,0.72) 100%)' }} />
 
       <StatusBar />
 
